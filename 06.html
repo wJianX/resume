@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="js/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <xz-todu></xz-todu>
+    </div>
+    <template id="tplTodo">
+        <div>
+            <xz-todo-add @add="addTask"></xz-todo-add>
+            <xz-todo-list :tasks="tasks"></xz-todo-list>
+        </div>
+    </template>
+    <template id="tplTodoAdd">
+        <div>
+            <input type="text" v-model="task">
+            <button @click="add()">添加</button>
+        </div>
+    </template>
+    <template id="tplTodoList">
+        <div>
+            <ul>
+                <li v-for="(task,i) in tasks">
+                    <xz-todo-item :task="task" :i="i" @link="remove"></xz-todo-item>
+                </li>
+            </ul>
+        </div>
+    </template>
+    <template id="tplTodoItem">
+        <div>
+            <span>{{i+1}}</span>-<span>{{task}}</span>
+            <button @click="del(i)">x</button>
+        </div>
+    </template>
+
+    <script>
+        var xzTodoItem=("xz-todo-item",{
+            template:"#tplTodoItem",
+            props:["task","i"],
+            methods:{
+                del(i){
+                    if(confirm("是否继续删除第"+(i+1)+"项"))
+                        this.$emit("link",i)
+                }
+            }
+        })
+        var xzTodoList=("xz-todo-list",{
+            template:"#tplTodoList",
+            props:["tasks"],
+            components:{
+                xzTodoItem
+            },
+            methods:{
+                remove(i){
+                    this.tasks.splice(i,1)
+                }
+            }
+        })
+        var xzTodoAdd=("xz-todo-add",{
+            template:"#tplTodoAdd",
+            data:function(){
+                return {task:""}
+            },
+            methods:{
+                add(){
+                    this.$emit("add",this.task);
+                }
+            }
+        })
+        Vue.component("xz-todu",{
+            template:"#tplTodo",
+            data:function(){
+                return {
+                    tasks:["吃饭","睡觉","打麻将"]
+                }
+            },
+            components:{
+                xzTodoList,
+                xzTodoAdd
+            },
+            methods:{
+                addTask(task){
+                    console.log("todo:"+task)
+                    this.tasks.push(task);
+                }
+            }
+        })
+        new Vue({
+            el:"#app"
+        })
+    </script>
+</body>
+</html>
